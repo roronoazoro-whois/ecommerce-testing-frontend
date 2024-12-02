@@ -40,11 +40,16 @@ const AllCoupons = () => {
   }, [dispatch]);
 
   const handleDelete = async (id) => {
-    axios.delete(`${server}/coupon/delete-coupon/${id}`,{withCredentials: true}).then((res) => {
-      toast.success("Coupon code deleted succesfully!")
-    })
-    window.location.reload();
+    try {
+      await axios.delete(`${server}/coupon/delete-coupon/${id}`, { withCredentials: true });
+      toast.success("Coupon code deleted successfully!");
+      // Cập nhật lại danh sách mã khuyến mãi mà không cần tải lại trang
+      setCoupouns(coupouns.filter((coupon) => coupon._id !== id));
+    } catch (error) {
+      toast.error("Error deleting coupon code");
+    }
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
