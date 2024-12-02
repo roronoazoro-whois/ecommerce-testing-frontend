@@ -31,7 +31,8 @@ const ShopInfo = ({ isOwner }) => {
     axios.get(`${server}/shop/logout`,{
       withCredentials: true,
     });
-    window.location.reload();
+    // chuyển hướng về trang chủ
+    window.location.href = "/";
   };
 
   const totalReviewsLength =
