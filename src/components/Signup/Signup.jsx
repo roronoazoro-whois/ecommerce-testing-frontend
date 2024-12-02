@@ -13,6 +13,9 @@ const Singup = () => {
   const [password, setPassword] = useState("");
   const [visible, setVisible] = useState(false);
   const [avatar, setAvatar] = useState(null);
+  //new
+  const [error, setError] = useState("");
+
 
   const handleFileInputChange = (e) => {
     const reader = new FileReader();
@@ -29,19 +32,30 @@ const Singup = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    axios
-      .post(`${server}/user/create-user`, { name, email, password, avatar })
-      .then((res) => {
-        toast.success(res.data.message);
-        setName("");
-        setEmail("");
-        setPassword("");
-        setAvatar();
-      })
-      .catch((error) => {
-        toast.error(error.response.data.message);
+    // Kiểm tra điều kiện mật khẩu
+    if (password.length < 8 || !/[A-Z]/.test(password) || !/[0-9]/.test(password)) {
+      setError("Password must be at least 8 characters long and include at least one uppercase letter and one number.");
+      return;
+    }
+    setError(""); // Xóa thông báo lỗi nếu mật khẩu hợp lệ
+
+    try {
+      const res = await axios.post(`${server}/user/create-user`, {
+        name,
+        email,
+        password,
+        avatar,
       });
+      toast.success(res.data.message);
+      setName("");
+      setEmail("");
+      setPassword("");
+      setAvatar(null);
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
   };
+
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
@@ -124,7 +138,9 @@ const Singup = () => {
                   />
                 )}
               </div>
+              {error && <p className="mt-2 text-sm text-red-600">{error}</p>}
             </div>
+
 
             <div>
               <label
